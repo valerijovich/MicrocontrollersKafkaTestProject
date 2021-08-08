@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "kafka.server",
+      "type": "java.lang.String",
+      "description": "Description for kafka.server."
+    },
+    {
+      "name": "kafka.group.id",
+      "type": "java.lang.String",
+      "description": "Description for kafka.group.id."
+    }
+  ] }
