@@ -9,12 +9,13 @@ import org.valerijovich.receiver.entity.UserEntity;
 
 import javax.annotation.PostConstruct;
 
+// Заполняем в БД первые 10 строк значениями
 @Slf4j
 @Service
 public class DBInitializer{
-    private final Logger logger = LoggerFactory.getLogger(DBInitializer.class);
 
-    UserService userService;
+    private final Logger logger = LoggerFactory.getLogger(DBInitializer.class);
+    private final UserService userService;
 
     @Autowired
     public DBInitializer(UserService userService) {
@@ -22,12 +23,12 @@ public class DBInitializer{
     }
 
     @PostConstruct
-    void init(){
+    void init() {
         logger.info("Starting Database initialization...");
 
         for (int i = 1; i <= 10; i++) {
             UserEntity user = new UserEntity();
-            user.setId((long) i);
+            user.setId(i);
             user.setEmail("johndoe" + i + "@gmail.com");
             user.setName("John Doe " + i);
             userService.createUser(user);

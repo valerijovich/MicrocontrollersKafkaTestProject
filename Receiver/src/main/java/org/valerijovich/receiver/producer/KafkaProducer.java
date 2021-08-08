@@ -1,6 +1,5 @@
-package com.valerijovich.sender.config;
+package org.valerijovich.receiver.producer;
 
-import com.valerijovich.sender.dto.MessageDto;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,19 +10,24 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.valerijovich.receiver.entity.UserEntity;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// Настройка продюсера кафки
 @Configuration
-public class KafkaProducerConfig {
+public class KafkaProducer {
 
+    // Сервер Kafka берётся из application.properties
     @Value("${kafka.server}")
     private String kafkaServer;
 
+    // Айди продюсера (берётся из application.properties), по которому потом подписчик сможет получать из него сообщения
     @Value("${kafka.producer.id}")
     private String kafkaProducerId;
 
+    // Записываем в мапу конфигурационные настройки для продюсера
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -34,14 +38,16 @@ public class KafkaProducerConfig {
         return props;
     }
 
+    // Передаём созданную мапу producerConfigs в конструктор producerUserFactory для создания фабрики
     @Bean
-    public ProducerFactory<Long, MessageDto> producerMessageFactory() {
+    public ProducerFactory<Object, UserEntity> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
+    // Создаём фабрику
     @Bean
-    public KafkaTemplate<Long, MessageDto> kafkaTemplate() {
-        KafkaTemplate<Long, MessageDto> template = new KafkaTemplate<>(producerMessageFactory());
+    public KafkaTemplate<Object, UserEntity> kafkaTemplate() {
+        KafkaTemplate<Object, UserEntity> template = new KafkaTemplate<>(producerFactory());
         template.setMessageConverter(new StringJsonMessageConverter());
         return template;
     }

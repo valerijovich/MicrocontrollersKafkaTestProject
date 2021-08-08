@@ -1,4 +1,4 @@
-package org.valerijovich.receiver.config;
+package org.valerijovich.receiver.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.LongDeserializer;
@@ -11,40 +11,23 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.converter.StringJsonMessageConverter;
-import org.valerijovich.receiver.dto.MessageDto;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// Настройка подписчика кафки
 @Configuration
-public class KafkaConsumerConfig {
+public class KafkaConsumer {
 
+    // Сервер Kafka берётся из application.properties
     @Value("${kafka.server}")
     private String kafkaServer;
 
+    // Название группы (берётся из application.properties), из которой подписчик будет брать сообщения
     @Value("${kafka.group.id}")
     private String kafkaGroupId;
 
-    @Bean
-    public KafkaListenerContainerFactory<?> singleFactory() {
-        ConcurrentKafkaListenerContainerFactory<Long, MessageDto> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
-        factory.setBatchListener(false);
-        factory.setMessageConverter(new StringJsonMessageConverter());
-        return factory;
-    }
-
-    @Bean
-    public ConsumerFactory<Long, MessageDto> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
-    }
-
-//    @Bean
-//    public KafkaListenerContainerFactory<?> kafkaListenerContainerFactory() {
-//        return new ConcurrentKafkaListenerContainerFactory<>();
-//    }
-
+    // Записываем в мапу конфигурационные настройки для подписчика
     @Bean
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -56,8 +39,20 @@ public class KafkaConsumerConfig {
         return props;
     }
 
-//    @Bean
-//    public StringJsonMessageConverter converter() {
-//        return new StringJsonMessageConverter();
-//    }
+    // Передаём созданную мапу consumerConfigs в конструктор consumerFactory для создания фабрики
+    @Bean
+    public ConsumerFactory<Long, Integer> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    }
+
+    // Создаём фабрику
+    @Bean
+    public KafkaListenerContainerFactory<?> singleFactory() {
+        ConcurrentKafkaListenerContainerFactory<Long, Integer> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory());
+        factory.setBatchListener(false);
+        factory.setMessageConverter(new StringJsonMessageConverter());
+        return factory;
+    }
 }

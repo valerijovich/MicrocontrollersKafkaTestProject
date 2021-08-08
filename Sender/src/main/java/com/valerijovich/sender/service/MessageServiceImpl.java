@@ -1,8 +1,5 @@
 package com.valerijovich.sender.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.valerijovich.sender.dto.MessageDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,21 +12,24 @@ import java.util.Random;
 @Slf4j
 public class MessageServiceImpl implements MessageService {
 
-    private final KafkaTemplate<Long, MessageDto> kafkaMessageTemplate;
+    private final KafkaTemplate<Long, Integer> kafkaMessageTemplate;
 
-    public MessageServiceImpl(KafkaTemplate<Long, MessageDto> kafkaMessageTemplate) {
+    @Autowired
+    public MessageServiceImpl(KafkaTemplate<Long, Integer> kafkaMessageTemplate) {
         this.kafkaMessageTemplate = kafkaMessageTemplate;
     }
 
+    // Метод produce каждые 5 секунд отправляет сообщение в топик кафки под именем server.message
     @Scheduled(initialDelay = 5000, fixedDelay = 5000)
     @Override
     public void produce() {
-        MessageDto dto = createDto();
-        log.info("Sender sent object to kafka: {}", dto);
-        kafkaMessageTemplate.send("server.message", dto);
+        Integer message = createRandomNumber();
+        log.info("Sender sent random number to kafka: {}", message);
+        kafkaMessageTemplate.send("server.message", message);
     }
 
-    private MessageDto createDto() {
-        return new MessageDto(new Random().nextInt(10) + 1);
+    // Метод createRandomNumber генерирует случайное число от 1 до 10 включительно
+    private Integer createRandomNumber() {
+        return new Random().nextInt(10) + 1;
     }
 }

@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import org.valerijovich.receiver.entity.UserEntity;
 import org.valerijovich.receiver.repository.UserRepository;
 
+import java.util.Optional;
+
+// Сервисный слой для репозитория
 @Service
 public class UserService {
 
@@ -19,7 +22,7 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public UserEntity findById(Long userId){
-        return userRepository.findById(userId).orElse(null);
+    public Optional<UserEntity> findById(Integer userId){
+        return userRepository.findById(userId);
     }
 }
